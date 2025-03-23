@@ -234,3 +234,106 @@ This endpoint requires the user to be authenticated by providing a valid JWT tok
   ```
 
 ---
+
+# Captain Routes Documentation
+
+## Register Captain Endpoint
+
+### Endpoint
+
+`POST /captains/register`
+
+### Description
+
+This endpoint is used to register a new captain. It validates the input data, hashes the password, creates a new captain in the database, and returns an authentication token.
+
+### Request Body
+
+The request body must be a JSON object with the following fields:
+
+- `fullName`: An object containing:
+  - `firstname`: A string with at least 3 characters (required)
+  - `lastname`: A string with at least 3 characters (required)
+- `email`: A valid email address (required)
+- `password`: A string with at least 6 characters (required)
+- `vehicle`: An object containing:
+  - `color`: A string with at least 3 characters (required)
+  - `plate`: A string with at least 3 characters (required)
+  - `capacity`: A positive integer (required)
+  - `vehicleType`: A string, one of `car`, `motorcycle`, or `auto` (required)
+
+Example:
+
+```json
+{
+  "fullName": {
+    "firstname": "John",
+    "lastname": "Doe"
+  },
+  "email": "captain@example.com",
+  "password": "password123",
+  "vehicle": {
+    "color": "Red",
+    "plate": "ABC123",
+    "capacity": 4,
+    "vehicleType": "car"
+  }
+}
+```
+
+### Responses
+
+- **201 Created**: Captain successfully registered. Returns the captain object and an authentication token.
+  
+  Example:
+  
+  ```json
+  {
+    "captain": {
+      "_id": "captainId",
+      "fullName": {
+        "firstname": "John",
+        "lastname": "Doe"
+      },
+      "email": "captain@example.com",
+      "vehicle": {
+        "color": "Red",
+        "plate": "ABC123",
+        "capacity": 4,
+        "vehicleType": "car"
+      }
+    },
+    "token": "JWT Token"
+  }
+  ```
+
+- **400 Bad Request**: Validation failed. Returns an array of error messages.
+  
+  Example:
+  
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "First name must be at least 3 characters long",
+        "param": "fullName.firstname",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+- **400 Bad Request**: Captain already exists. Returns an error message.
+  
+  Example:
+  
+  ```json
+  {
+    "error": "Captain already exists"
+  }
+  ```
+
+### Notes
+
+- Ensure that the `JWT_SECRET` environment variable is set for token generation.
+- The MongoDB connection string should be correctly configured in the `.env` file.
