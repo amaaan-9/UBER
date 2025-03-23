@@ -249,29 +249,176 @@ This endpoint is used to register a new captain. It validates the input data, ha
 
 ### Request Body
 
-The request body must be a JSON object with the following fields:
+```json
+{
+  "fullName": {
+    "firstname": "John", // Required, string, minimum 3 characters
+    "lastname": "Doe" // Required, string, minimum 3 characters
+  },
+  "email": "captain@example.com", // Required, valid email format
+  "password": "password123", // Required, string, minimum 6 characters
+  "vehicle": {
+    "color": "Red", // Required, string, minimum 3 characters
+    "plate": "ABC123", // Required, string, minimum 3 characters, unique
+    "capacity": 4, // Required, positive integer
+    "vehicleType": "car" // Required, one of ["car", "motorcycle", "auto"]
+  }
+}
+```
 
-- `fullName`: An object containing:
-  - `firstname`: A string with at least 3 characters (required)
-  - `lastname`: A string with at least 3 characters (required)
-- `email`: A valid email address (required)
-- `password`: A string with at least 6 characters (required)
-- `vehicle`: An object containing:
-  - `color`: A string with at least 3 characters (required)
-  - `plate`: A string with at least 3 characters (required)
-  - `capacity`: A positive integer (required)
-  - `vehicleType`: A string, one of `car`, `motorcycle`, or `auto` (required)
+### Responses
 
-Example:
+- **201 Created**: Captain successfully registered.
 
 ```json
 {
+  "captain": {
+    "_id": "captainId",
+    "fullName": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "captain@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  },
+  "token": "JWT Token" // Authentication token valid for 24 hours
+}
+```
+
+- **400 Bad Request**: Validation failed.
+
+```json
+{
+  "errors": [
+    {
+      "msg": "First name must be at least 3 characters long", // Error message
+      "param": "fullName.firstname", // Field with the error
+      "location": "body" // Location of the error
+    }
+  ]
+}
+```
+
+- **400 Bad Request**: Captain already exists.
+
+```json
+{
+  "error": "Captain already exists"
+}
+```
+
+---
+
+## Login Captain Endpoint
+
+### Endpoint
+
+`POST /captains/login`
+
+### Description
+
+This endpoint is used to authenticate a captain. It validates the input data, checks the credentials, and returns an authentication token if successful.
+
+### Request Body
+
+```json
+{
+  "email": "captain@example.com", // Required, valid email format
+  "password": "password123" // Required, string, minimum 6 characters
+}
+```
+
+### Responses
+
+- **200 OK**: Captain successfully authenticated.
+
+```json
+{
+  "captain": {
+    "_id": "captainId",
+    "fullName": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "email": "captain@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  },
+  "token": "JWT Token" // Authentication token valid for 24 hours
+}
+```
+
+- **401 Unauthorized**: Invalid email or password.
+
+```json
+{
+  "error": "Invalid email or password"
+}
+```
+
+---
+
+## Logout Captain Endpoint
+
+### Endpoint
+
+`GET /captains/logout`
+
+### Description
+
+This endpoint is used to log out the authenticated captain by blacklisting the token.
+
+### Authentication
+
+Requires a valid JWT token in the `Authorization` header or as a cookie.
+
+### Responses
+
+- **200 OK**: Successfully logged out.
+
+```json
+{
+  "message": "Logged out successfully"
+}
+```
+
+---
+
+## Get Captain Profile Endpoint
+
+### Endpoint
+
+`GET /captains/profile`
+
+### Description
+
+This endpoint is used to retrieve the profile of the authenticated captain.
+
+### Authentication
+
+Requires a valid JWT token in the `Authorization` header or as a cookie.
+
+### Responses
+
+- **200 OK**: Returns the captain's profile.
+
+```json
+{
+  "_id": "captainId",
   "fullName": {
     "firstname": "John",
     "lastname": "Doe"
   },
   "email": "captain@example.com",
-  "password": "password123",
   "vehicle": {
     "color": "Red",
     "plate": "ABC123",
@@ -281,59 +428,10 @@ Example:
 }
 ```
 
-### Responses
+- **401 Unauthorized**: Authentication failed.
 
-- **201 Created**: Captain successfully registered. Returns the captain object and an authentication token.
-  
-  Example:
-  
-  ```json
-  {
-    "captain": {
-      "_id": "captainId",
-      "fullName": {
-        "firstname": "John",
-        "lastname": "Doe"
-      },
-      "email": "captain@example.com",
-      "vehicle": {
-        "color": "Red",
-        "plate": "ABC123",
-        "capacity": 4,
-        "vehicleType": "car"
-      }
-    },
-    "token": "JWT Token"
-  }
-  ```
-
-- **400 Bad Request**: Validation failed. Returns an array of error messages.
-  
-  Example:
-  
-  ```json
-  {
-    "errors": [
-      {
-        "msg": "First name must be at least 3 characters long",
-        "param": "fullName.firstname",
-        "location": "body"
-      }
-    ]
-  }
-  ```
-
-- **400 Bad Request**: Captain already exists. Returns an error message.
-  
-  Example:
-  
-  ```json
-  {
-    "error": "Captain already exists"
-  }
-  ```
-
-### Notes
-
-- Ensure that the `JWT_SECRET` environment variable is set for token generation.
-- The MongoDB connection string should be correctly configured in the `.env` file.
+```json
+{
+  "message": "Unauthorized"
+}
+```
