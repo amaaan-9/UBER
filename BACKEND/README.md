@@ -73,4 +73,82 @@ Example:
 ## Notes
 
 - Ensure that the `JWT_SECRET` environment variable is set for token generation.
+- The MongoDB connection string should be correctly configured in the `.env` file.
+
+## Login Endpoint Documentation
+
+### Endpoint
+
+`POST /users/login`
+
+### Description
+
+This endpoint is used to authenticate a user. It validates the input data, checks the credentials against the database, and returns an authentication token if successful.
+
+### Request Body
+
+The request body must be a JSON object with the following fields:
+
+- `email`: A valid email address (required)
+- `password`: A string with at least 8 characters (required)
+
+Example:
+
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+### Responses
+
+- **200 OK**: User successfully authenticated. Returns the user object and an authentication token.
+  
+  Example:
+  
+  ```json
+  {
+    "user": {
+      "_id": "userId",
+      "email": "user@example.com",
+      "fullName": {
+        "firstname": "John",
+        "lastname": "Doe"
+      },
+      "isDriver": true
+    },
+    "token": "authToken"
+  }
+  ```
+
+- **400 Bad Request**: Validation failed. Returns an array of error messages.
+  
+  Example:
+  
+  ```json
+  {
+    "errors": [
+      {
+        "msg": "Invalid email",
+        "param": "email",
+        "location": "body"
+      }
+    ]
+  }
+  ```
+
+- **401 Unauthorized**: Authentication failed. Returns an error message indicating invalid credentials.
+  
+  Example:
+  
+  ```json
+  {
+    "error": "Invalid email or password"
+  }
+  ```
+
+### Notes
+
+- Ensure that the `JWT_SECRET` environment variable is set for token generation.
 - The MongoDB connection string should be correctly configured in the `.env` file. 
