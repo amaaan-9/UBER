@@ -151,4 +151,86 @@ Example:
 ### Notes
 
 - Ensure that the `JWT_SECRET` environment variable is set for token generation.
-- The MongoDB connection string should be correctly configured in the `.env` file. 
+- The MongoDB connection string should be correctly configured in the `.env` file.
+
+## Profile Endpoint Documentation
+
+### Endpoint
+
+`GET /users/profile`
+
+### Description
+
+This endpoint is used to retrieve the profile of the authenticated user.
+
+### Authentication
+
+This endpoint requires the user to be authenticated by providing a valid JWT token in the `Authorization` header or as a cookie.
+
+### Responses
+
+- **200 OK**: Returns the user's profile information.
+  
+  Example:
+  
+  ```json
+  {
+    "_id": "userId",
+    "email": "user@example.com",
+    "fullName": {
+      "firstname": "John",
+      "lastname": "Doe"
+    },
+    "isDriver": true
+  }
+  ```
+
+- **401 Unauthorized**: Authentication failed. Returns an error message indicating the user is not authorized.
+  
+  Example:
+  
+  ```json
+  {
+    "message": "Unauthorized"
+  }
+  ```
+
+---
+
+## Logout Endpoint Documentation
+
+### Endpoint
+
+`GET /users/logout`
+
+### Description
+
+This endpoint is used to log out the authenticated user by clearing the authentication token.
+
+### Authentication
+
+This endpoint requires the user to be authenticated by providing a valid JWT token in the `Authorization` header or as a cookie.
+
+### Responses
+
+- **200 OK**: Successfully logged out. Returns a success message.
+  
+  Example:
+  
+  ```json
+  {
+    "message": "Logged out successfully"
+  }
+  ```
+
+- **401 Unauthorized**: Authentication failed. Returns an error message indicating the user is not authorized.
+  
+  Example:
+  
+  ```json
+  {
+    "message": "Unauthorized"
+  }
+  ```
+
+---
